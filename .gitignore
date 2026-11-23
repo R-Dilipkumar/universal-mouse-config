@@ -1,0 +1,18 @@
+# Build output
+bin/
+obj/
+publish/
+artifacts/
+
+# Editors
+.vs/
+.vscode/
+*.user
+*.suo
+
+# Test results
+TestResults/
+*.trx
+
+# Local only: session log
+session.md

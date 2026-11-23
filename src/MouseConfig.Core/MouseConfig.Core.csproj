@@ -1,0 +1,3 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Device detection, Windows settings, profiles, remap engine, plugin interface. -->
+</Project>

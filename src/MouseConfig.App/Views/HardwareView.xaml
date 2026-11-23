@@ -1,0 +1,260 @@
+<UserControl x:Class="MouseConfig.App.Views.HardwareView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:MouseConfig.App.ViewModels"
+             xmlns:plugin="clr-namespace:MouseConfig.Plugins.Sunplus1BCF;assembly=MouseConfig.Plugins.Sunplus1BCF"
+             PreviewKeyDown="OnKeyCapture" PreviewMouseDown="OnMouseCapture">
+    <DockPanel Margin="{StaticResource PageMargin}">
+        <DockPanel DockPanel.Dock="Top" Margin="0,0,0,16">
+            <Border DockPanel.Dock="Right" Style="{StaticResource SuccessChip}" VerticalAlignment="Top">
+                <TextBlock Text="Saved in the mouse · works on any PC" />
+            </Border>
+            <StackPanel>
+                <TextBlock Text="Mouse memory" Style="{StaticResource PageTitle}" />
+                <TextBlock Style="{StaticResource PageSubtitle}"
+                           Text="Buttons, DPI and lighting stored inside the mouse itself. They keep working on any PC, even without this app." />
+            </StackPanel>
+        </DockPanel>
+
+        <!-- Not supported -->
+        <Border DockPanel.Dock="Top">
+            <Border.Style>
+                <Style TargetType="Border" BasedOn="{StaticResource Card}">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsSupported}" Value="False">
+                            <Setter Property="Visibility" Value="Visible" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+            <DockPanel>
+                <Border DockPanel.Dock="Left" Style="{StaticResource IconBubble}" Margin="0,0,14,0" VerticalAlignment="Top">
+                    <TextBlock Text="&#xE946;" Style="{StaticResource Icon}" HorizontalAlignment="Center" />
+                </Border>
+                <StackPanel>
+                    <TextBlock Text="Not available for this mouse yet" FontWeight="SemiBold" FontSize="15" />
+                    <TextBlock Text="{Binding UnsupportedReason}" TextWrapping="Wrap" Style="{StaticResource Dim}" Margin="0,4,0,0" />
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <!-- Save bar: always visible while the mouse can be changed -->
+        <Border DockPanel.Dock="Bottom" Padding="0,12,0,0" BorderThickness="0,1,0,0" BorderBrush="{DynamicResource DividerBrush}"
+                Visibility="{Binding HasRead, Converter={StaticResource BoolToVisibility}}">
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                    <Button Content="Restore backup…" Command="{Binding RestoreBackupCommand}" Padding="14,6" Margin="0,0,8,0"
+                            ToolTip="Puts the buttons, active DPI and lighting from your first backup back into the mouse." />
+                    <Button Content="Discard" Command="{Binding DiscardCommand}" Padding="14,6" Margin="0,0,8,0"
+                            ToolTip="Throw away changes you haven't saved." />
+                    <Button Content="Save to mouse…" Command="{Binding SaveCommand}" Style="{StaticResource PrimaryButton}" />
+                </StackPanel>
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="{Binding ChangeText}" FontWeight="SemiBold" />
+                    <TextBlock Text="Nothing changes until you click Save and say Yes." Style="{StaticResource Note}" />
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Visibility="{Binding IsSupported, Converter={StaticResource BoolToVisibility}}">
+            <StackPanel Margin="0,0,8,12">
+                <!-- Status -->
+                <Border Style="{StaticResource Card}" Margin="0,0,0,12">
+                    <DockPanel>
+                        <Button DockPanel.Dock="Right" Command="{Binding ReadCommand}" Padding="12,4" VerticalAlignment="Center" Margin="12,0,0,0"
+                                ToolTip="Read the settings from the mouse again (changes nothing)">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xE72C;" Style="{StaticResource Icon}" FontSize="12" Margin="0,0,6,0" />
+                                <TextBlock Text="Read again" />
+                            </StackPanel>
+                        </Button>
+                        <Border DockPanel.Dock="Left" Style="{StaticResource IconBubble}" Margin="0,0,14,0">
+                            <TextBlock Text="&#xE713;" Style="{StaticResource Icon}" HorizontalAlignment="Center" />
+                        </Border>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Text="{Binding State}" TextWrapping="Wrap" FontWeight="SemiBold">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding StateIsError}" Value="True">
+                                                <Setter Property="Foreground" Value="{DynamicResource CriticalBrush}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                            <TextBlock Text="{Binding FoundText}" Style="{StaticResource Note}" Margin="0,2,0,0"
+                                       Visibility="{Binding HasRead, Converter={StaticResource BoolToVisibility}}" />
+                        </StackPanel>
+                    </DockPanel>
+                </Border>
+
+                <StackPanel Visibility="{Binding HasRead, Converter={StaticResource BoolToVisibility}}">
+                    <!-- Buttons -->
+                    <Border Style="{StaticResource Card}" Margin="0,0,0,12" IsEnabled="{Binding CanBeChanged}">
+                        <StackPanel>
+                            <TextBlock Text="Buttons" Style="{StaticResource SectionTitle}" />
+                            <TextBlock Style="{StaticResource Note}" Margin="0,0,0,10"
+                                       Text="Pick an action, or click Record and press the key (with Ctrl, Shift, Alt or Win if you like) or click the button you want. Press a button on your mouse to see which row it is. One button must stay Left click." />
+                            <ItemsControl ItemsSource="{Binding Slots}" AutomationProperties.Name="Button slots">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate DataType="{x:Type vm:SlotEditorViewModel}">
+                                        <Border x:Name="Row" CornerRadius="8" Padding="10,7" Margin="0,2" BorderThickness="1.5"
+                                                BorderBrush="Transparent" Background="Transparent">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="190" />
+                                                    <ColumnDefinition Width="240" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="*" />
+                                                </Grid.ColumnDefinitions>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto" />
+                                                    <RowDefinition Height="Auto" />
+                                                </Grid.RowDefinitions>
+                                                <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
+                                                    <TextBlock x:Name="SlotTitle" Text="{Binding Title}" FontWeight="SemiBold" />
+                                                    <TextBlock Text="{Binding NowText}" Style="{StaticResource Note}" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" />
+                                                </StackPanel>
+                                                <ComboBox Grid.Column="1" ItemsSource="{Binding Choices}" SelectedItem="{Binding SelectedChoice}"
+                                                          VerticalAlignment="Center" AutomationProperties.Name="{Binding Title}" />
+                                                <Button Grid.Column="2" Content="Record…" Command="{Binding StartCaptureCommand}" Padding="12,4" Margin="10,0,0,0"
+                                                        VerticalAlignment="Center" AutomationProperties.Name="{Binding Title, StringFormat='Record {0}'}"
+                                                        ToolTip="Then press any key (with Ctrl/Shift/Alt/Win if you like) or click a mouse or touchpad button." />
+                                                <TextBlock Grid.Column="3" Text="{Binding KeyText}" FontWeight="SemiBold" Margin="12,0,0,0"
+                                                           VerticalAlignment="Center" TextWrapping="Wrap" Foreground="{DynamicResource AccentTextBrush}" />
+                                                <StackPanel Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" Orientation="Horizontal" Margin="0,8,0,0"
+                                                            Visibility="{Binding IsKeyMode, Converter={StaticResource BoolToVisibility}}">
+                                                    <TextBlock Text="Hold with it:" Style="{StaticResource Dim}" VerticalAlignment="Center" Margin="0,0,10,0" />
+                                                    <CheckBox Content="Ctrl" IsChecked="{Binding Ctrl}" Margin="0,0,10,0" MinWidth="0" />
+                                                    <CheckBox Content="Shift" IsChecked="{Binding Shift}" Margin="0,0,10,0" MinWidth="0" />
+                                                    <CheckBox Content="Alt" IsChecked="{Binding Alt}" Margin="0,0,10,0" MinWidth="0" />
+                                                    <CheckBox Content="Win" IsChecked="{Binding Win}" MinWidth="0" />
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
+                                        <DataTemplate.Triggers>
+                                            <DataTrigger Binding="{Binding IsChanged}" Value="True">
+                                                <Setter TargetName="Row" Property="Background" Value="{DynamicResource AccentSoftBrush}" />
+                                                <Setter TargetName="SlotTitle" Property="Text" Value="{Binding Title, StringFormat='{}{0} • changed'}" />
+                                                <Setter TargetName="SlotTitle" Property="Foreground" Value="{DynamicResource AccentTextBrush}" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding IsCapturing}" Value="True">
+                                                <Setter TargetName="Row" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding IsFound}" Value="True">
+                                                <Setter TargetName="Row" Property="BorderBrush" Value="{DynamicResource SuccessBrush}" />
+                                                <Setter TargetName="Row" Property="Background" Value="{DynamicResource SuccessSoftBrush}" />
+                                            </DataTrigger>
+                                        </DataTemplate.Triggers>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+
+                    <Grid Margin="0,0,0,12" IsEnabled="{Binding CanBeChanged}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="12" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <!-- DPI -->
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="DPI (pointer speed in the mouse)" Style="{StaticResource SectionTitle}" />
+                                <TextBlock Style="{StaticResource Note}" Margin="0,0,0,10"
+                                           Text="Pick the step the mouse uses now. Higher moves the pointer further. The DPI button on your mouse moves through these steps." />
+                                <ListBox ItemsSource="{Binding DpiChoices}" SelectedItem="{Binding SelectedDpi}" Style="{StaticResource PillList}"
+                                         AutomationProperties.Name="Active DPI step">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate DataType="{x:Type vm:DpiChoice}">
+                                            <TextBlock Text="{Binding Text}" AutomationProperties.Name="{Binding Text}" />
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                                <TextBlock Style="{StaticResource Note}" Margin="0,4,0,0"
+                                           Text="Changing the step values themselves isn't supported yet: that part of the mouse's memory isn't documented." />
+                            </StackPanel>
+                        </Border>
+                        <!-- Lighting -->
+                        <Border Grid.Column="2" Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="Lighting" Style="{StaticResource SectionTitle}" />
+                                <TextBlock Style="{StaticResource Note}" Margin="0,0,0,10" Text="Pick an effect and how fast it moves." />
+                                <ListBox ItemsSource="{Binding LightingChoices}" SelectedItem="{Binding SelectedLighting}" Style="{StaticResource PillList}"
+                                         AutomationProperties.Name="Lighting effect">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate DataType="{x:Type vm:LightingChoice}">
+                                            <TextBlock Text="{Binding Name}" AutomationProperties.Name="{Binding Name}" />
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                                <StackPanel Margin="0,6,0,0" IsEnabled="{Binding SpeedApplies}">
+                                    <DockPanel>
+                                        <TextBlock DockPanel.Dock="Right" Text="{Binding LightingSpeed, StringFormat='{}{0} of 8'}" FontWeight="SemiBold" />
+                                        <TextBlock Text="Speed" FontWeight="SemiBold" />
+                                    </DockPanel>
+                                    <Slider Minimum="1" Maximum="8" TickFrequency="1" IsSnapToTickEnabled="True" IsMoveToPointEnabled="True"
+                                            Value="{Binding LightingSpeed}" Margin="0,6,0,0" AutomationProperties.Name="Lighting speed" />
+                                    <DockPanel>
+                                        <TextBlock DockPanel.Dock="Right" Text="Fast" Style="{StaticResource Note}" />
+                                        <TextBlock Text="Slow" Style="{StaticResource Note}" />
+                                    </DockPanel>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+
+                    <!-- Advanced -->
+                    <Expander Header="Safety checks and technical details">
+                        <Border Style="{StaticResource Card}" Margin="0,8,0,0">
+                            <StackPanel>
+                                <TextBlock Text="IDENTITY" Style="{StaticResource Overline}" />
+                                <TextBlock Text="{Binding Identity}" TextWrapping="Wrap" Margin="0,2,0,10" />
+                                <TextBlock Text="BACKUP" Style="{StaticResource Overline}" />
+                                <TextBox Text="{Binding BackupText, Mode=OneWay}" IsReadOnly="True" BorderThickness="0" Background="Transparent"
+                                         Padding="0" MinHeight="0" TextWrapping="Wrap" AutomationProperties.Name="Backup" Margin="0,2,0,10" />
+                                <TextBlock Text="SAFETY CHECKS (DONE BEFORE EVERY CHANGE)" Style="{StaticResource Overline}" Margin="0,0,0,4" />
+                                <ItemsControl ItemsSource="{Binding Checks}" AutomationProperties.Name="Safety checks">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate DataType="{x:Type plugin:ConfigCheck}">
+                                            <DockPanel Margin="0,3">
+                                                <TextBlock x:Name="Mark" DockPanel.Dock="Left" Text="&#xE73E;" Style="{StaticResource Icon}" Width="22"
+                                                           Foreground="{DynamicResource SuccessBrush}" />
+                                                <TextBlock Text="{Binding Name}" FontWeight="SemiBold" Margin="0,0,12,0" />
+                                                <TextBlock Text="{Binding Detail}" Style="{StaticResource Dim}" TextWrapping="Wrap" />
+                                            </DockPanel>
+                                            <DataTemplate.Triggers>
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition Binding="{Binding Ok}" Value="False" />
+                                                        <Condition Binding="{Binding BlocksWrites}" Value="False" />
+                                                    </MultiDataTrigger.Conditions>
+                                                    <Setter TargetName="Mark" Property="Text" Value="&#xE946;" />
+                                                    <Setter TargetName="Mark" Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+                                                </MultiDataTrigger>
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition Binding="{Binding Ok}" Value="False" />
+                                                        <Condition Binding="{Binding BlocksWrites}" Value="True" />
+                                                    </MultiDataTrigger.Conditions>
+                                                    <Setter TargetName="Mark" Property="Text" Value="&#xE711;" />
+                                                    <Setter TargetName="Mark" Property="Foreground" Value="{DynamicResource CriticalBrush}" />
+                                                </MultiDataTrigger>
+                                            </DataTemplate.Triggers>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                                <TextBlock Text="RAW SETTINGS BLOCK (READ ONLY)" Style="{StaticResource Overline}" Margin="0,12,0,4" />
+                                <TextBox Text="{Binding HexDump, Mode=OneWay}" IsReadOnly="True" FontFamily="Consolas" FontSize="12"
+                                         AutomationProperties.Name="Raw settings block" />
+                            </StackPanel>
+                        </Border>
+                    </Expander>
+                </StackPanel>
+            </StackPanel>
+        </ScrollViewer>
+    </DockPanel>
+</UserControl>

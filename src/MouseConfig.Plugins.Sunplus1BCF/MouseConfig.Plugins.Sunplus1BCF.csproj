@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Hardware plugin for Sunplus 1BCF:08A0 mice (Redgear). Code arrives in build step 7. -->
+  <ItemGroup>
+    <ProjectReference Include="..\MouseConfig.Core\MouseConfig.Core.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,161 @@
+<UserControl x:Class="MouseConfig.App.Views.PointerView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <UserControl.Resources>
+        <Style x:Key="Row" TargetType="Border" BasedOn="{StaticResource Card}">
+            <Setter Property="Margin" Value="0,0,0,6" />
+        </Style>
+        <Style x:Key="RowSlider" TargetType="Slider" BasedOn="{StaticResource {x:Type Slider}}">
+            <Setter Property="IsSnapToTickEnabled" Value="True" />
+            <Setter Property="IsMoveToPointEnabled" Value="True" />
+            <Setter Property="Margin" Value="0,6,0,0" />
+        </Style>
+    </UserControl.Resources>
+
+    <DockPanel Margin="{StaticResource PageMargin}" IsEnabled="{Binding CanEdit}">
+        <!-- Undo / defaults / restore, always visible -->
+        <Border DockPanel.Dock="Bottom" Padding="0,12,0,0" BorderThickness="0,1,0,0"
+                BorderBrush="{DynamicResource DividerBrush}">
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
+                    <Button Content="Undo" Command="{Binding UndoPointerCommand}" Padding="14,4" Margin="0,0,8,0" />
+                    <Button Content="Windows defaults" Command="{Binding PointerDefaultsCommand}" Padding="14,4" Margin="0,0,8,0"
+                            ToolTip="Puts this tab's settings back to what a fresh Windows uses." />
+                    <Button Content="Restore my original settings" Command="{Binding RestoreOriginalCommand}" Padding="14,4"
+                            ToolTip="Puts every Pointer and Scroll setting back to how it was before this app changed anything." />
+                </StackPanel>
+                <TextBlock Text="{Binding OriginalText}" Style="{StaticResource Note}" VerticalAlignment="Center"
+                           Margin="16,0,0,0" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" />
+            </DockPanel>
+        </Border>
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" MinWidth="320" />
+                <ColumnDefinition Width="260" />
+            </Grid.ColumnDefinitions>
+
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,12,0">
+                <StackPanel>
+                    <DockPanel Margin="0,0,0,16">
+                        <Border DockPanel.Dock="Right" Style="{StaticResource Chip}" VerticalAlignment="Top">
+                            <TextBlock Text="Windows setting · all mice" />
+                        </Border>
+                        <StackPanel>
+                            <TextBlock Text="Pointer" Style="{StaticResource PageTitle}" />
+                            <TextBlock Style="{StaticResource PageSubtitle}"
+                                       Text="How the pointer moves and how clicks work. These are Windows' own settings, so they apply to all mice. Changes apply right away." />
+                        </StackPanel>
+                    </DockPanel>
+
+                    <Border Style="{StaticResource Row}">
+                        <StackPanel>
+                            <DockPanel>
+                                <TextBlock DockPanel.Dock="Right" Text="{Binding PointerSpeed}" FontWeight="SemiBold" />
+                                <TextBlock Text="Pointer speed" FontWeight="SemiBold" />
+                            </DockPanel>
+                            <Slider Style="{StaticResource RowSlider}" Minimum="1" Maximum="20" TickFrequency="1"
+                                    Value="{Binding PointerSpeed}" AutomationProperties.Name="Pointer speed" />
+                            <DockPanel>
+                                <TextBlock DockPanel.Dock="Right" Text="Fast" Style="{StaticResource Note}" />
+                                <TextBlock Text="Slow · Windows default is 10" Style="{StaticResource Note}" />
+                            </DockPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource Row}">
+                        <StackPanel>
+                            <CheckBox Content="Enhance pointer precision" IsChecked="{Binding EnhancePrecision}" FontWeight="SemiBold" />
+                            <TextBlock Style="{StaticResource Note}" Margin="28,0,0,0"
+                                       Text="Moving the mouse faster moves the pointer further. Many gamers turn this off for steadier aim." />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource Row}">
+                        <StackPanel>
+                            <CheckBox Content="Swap left and right buttons" IsChecked="{Binding SwapButtons}" FontWeight="SemiBold" />
+                            <TextBlock Style="{StaticResource Note}" Margin="28,0,0,0"
+                                       Text="For left-handed use: the right button becomes the main click." />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource Row}">
+                        <StackPanel>
+                            <DockPanel>
+                                <TextBlock DockPanel.Dock="Right" Text="{Binding DoubleClickMs, StringFormat={}{0} ms}" FontWeight="SemiBold" />
+                                <TextBlock Text="Double-click speed" FontWeight="SemiBold" />
+                            </DockPanel>
+                            <Slider Style="{StaticResource RowSlider}" Minimum="200" Maximum="900" TickFrequency="10"
+                                    IsDirectionReversed="True" Value="{Binding DoubleClickMs}" AutomationProperties.Name="Double-click speed" />
+                            <DockPanel>
+                                <TextBlock DockPanel.Dock="Right" Text="Fast" Style="{StaticResource Note}" />
+                                <TextBlock Text="Slow · the most time allowed between the two clicks. Try it on the folder." Style="{StaticResource Note}" />
+                            </DockPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource Row}">
+                        <StackPanel>
+                            <CheckBox Content="ClickLock" IsChecked="{Binding ClickLock}" FontWeight="SemiBold" />
+                            <TextBlock Style="{StaticResource Note}" Margin="28,0,0,0"
+                                       Text="Hold the main button briefly to lock it down, so you can drag without holding. Click again to let go." />
+                            <StackPanel Margin="28,4,0,0" IsEnabled="{Binding ClickLock}">
+                                <DockPanel>
+                                    <TextBlock DockPanel.Dock="Right" Text="{Binding ClickLockMs, StringFormat={}{0} ms}" />
+                                    <TextBlock Text="How long to hold" Style="{StaticResource Dim}" />
+                                </DockPanel>
+                                <Slider Style="{StaticResource RowSlider}" Minimum="200" Maximum="2200" TickFrequency="100"
+                                        Value="{Binding ClickLockMs}" AutomationProperties.Name="ClickLock time" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource Row}">
+                        <StackPanel>
+                            <CheckBox Content="Pointer trails" IsChecked="{Binding TrailsOn}" FontWeight="SemiBold" />
+                            <StackPanel Margin="28,4,0,0" IsEnabled="{Binding TrailsOn}">
+                                <DockPanel>
+                                    <TextBlock DockPanel.Dock="Right" Text="{Binding TrailLength}" />
+                                    <TextBlock Text="Trail length" Style="{StaticResource Dim}" />
+                                </DockPanel>
+                                <Slider Style="{StaticResource RowSlider}" Minimum="2" Maximum="7" TickFrequency="1"
+                                        Value="{Binding TrailLength}" AutomationProperties.Name="Trail length" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource Row}">
+                        <StackPanel>
+                            <CheckBox Content="Hide pointer while typing" IsChecked="{Binding HideWhileTyping}" FontWeight="SemiBold" Margin="0,0,0,6" />
+                            <CheckBox Content="Show pointer location when I press Ctrl" IsChecked="{Binding ShowLocationWithCtrl}" FontWeight="SemiBold" Margin="0,0,0,6" />
+                            <CheckBox Content="Snap pointer to the default button in dialog boxes" IsChecked="{Binding SnapToDefaultButton}" FontWeight="SemiBold" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- Try it here -->
+            <StackPanel Grid.Column="1" Margin="12,0,0,0">
+                <TextBlock Text="Try it" Style="{StaticResource SectionTitle}" Margin="0,4,0,8" />
+                <Border Style="{StaticResource Card}" Height="190" Padding="0" ClipToBounds="True">
+                    <Grid>
+                        <TextBlock Text="Click each dot to feel the speed" Style="{StaticResource Note}"
+                                   HorizontalAlignment="Center" Margin="0,8,0,0" />
+                        <Canvas x:Name="TargetArea" Loaded="OnTargetAreaLoaded" />
+                    </Grid>
+                </Border>
+                <TextBlock x:Name="TargetScore" Style="{StaticResource Note}" Margin="0,4,0,0" />
+
+                <Border Style="{StaticResource Card}" Margin="0,16,0,0" Cursor="Hand"
+                        MouseLeftButtonDown="OnFolderMouseDown" AutomationProperties.Name="Double-click test folder">
+                    <StackPanel HorizontalAlignment="Center">
+                        <TextBlock x:Name="FolderIcon" Text="&#xE8B7;" FontFamily="{StaticResource IconFont}" FontSize="40"
+                                   HorizontalAlignment="Center" />
+                        <TextBlock x:Name="FolderText" Text="Double-click the folder" Style="{StaticResource Note}"
+                                   HorizontalAlignment="Center" Margin="0,4,0,0" />
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </Grid>
+    </DockPanel>
+</UserControl>

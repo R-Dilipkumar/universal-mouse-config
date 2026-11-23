@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/MouseConfig.App/MouseConfig.App.csproj" />
+    <Project Path="src/MouseConfig.Core/MouseConfig.Core.csproj" />
+    <Project Path="src/MouseConfig.Plugins.Sunplus1BCF/MouseConfig.Plugins.Sunplus1BCF.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/MouseConfig.Tests/MouseConfig.Tests.csproj" />
+  </Folder>
+</Solution>

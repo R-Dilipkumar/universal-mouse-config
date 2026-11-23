@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>MouseConfig</AssemblyName>
+    <RootNamespace>MouseConfig.App</RootNamespace>
+    <!-- WPF's built-in Fluent theme (ThemeMode) is still marked experimental in .NET 10. -->
+    <NoWarn>$(NoWarn);WPF0001</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MouseConfig.Core\MouseConfig.Core.csproj" />
+    <ProjectReference Include="..\MouseConfig.Plugins.Sunplus1BCF\MouseConfig.Plugins.Sunplus1BCF.csproj" />
+  </ItemGroup>
+
+</Project>

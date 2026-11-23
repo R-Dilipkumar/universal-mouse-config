@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="xunit.v3.mtp-v2" Version="4.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\MouseConfig.Core\MouseConfig.Core.csproj" />
+    <ProjectReference Include="..\..\src\MouseConfig.Plugins.Sunplus1BCF\MouseConfig.Plugins.Sunplus1BCF.csproj" />
+  </ItemGroup>
+
+</Project>
