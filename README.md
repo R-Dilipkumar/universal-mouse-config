@@ -44,7 +44,7 @@ For Redgear / Sunplus `1BCF:08A0` mice. More makers can be added as plugins; see
 - A scroll wheel that jumps back a notch is a worn or dirty wheel sensor; the mouse can't be told to ignore it. Cleaning the sensor with contact cleaner often fixes it.
 
 ## How different mice are set up
-Short version: plain mice store nothing and are fully covered by Windows' settings; gaming mice store settings with each maker's own commands; many budget brands share a few chips; newer mice are often set up in the browser. Details and sources: [docs/research.md](docs/research.md).
+Short version: plain mice store nothing and are fully covered by Windows' settings; gaming mice store settings with each maker's own commands; many budget brands share a few chips; newer mice are often set up in the browser. Details and sources: [research page](https://r-dilipkumar.github.io/universal-mouse-config/research.html) ([source](docs/research.md)).
 
 ## Build from source
 Needs the [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) on Windows.
